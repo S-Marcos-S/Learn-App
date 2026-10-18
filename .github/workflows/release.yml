@@ -1,0 +1,45 @@
+name: Publicar Release no GitHub
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Criar GitHub Release Oficial
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "⚡ LearnApp ${{ github.ref_name }}"
+          body: |
+            ## 🎉 Bem-vindo à versão ${{ github.ref_name }} do LearnApp!
+
+            Aplicativo de estudos com interface inspirada no Duolingo, suporte adaptativo completo para **Android e Desktop**, e **criação 100% autônoma de novas aulas diárias por IA**.
+
+            ---
+
+            ### 🚀 Destaques desta Release:
+            - 🗺️ **Trilha de Estudos Estilo Duolingo:** Caminho em zigue-zague senoidal com nós táteis 3D, indicador de aula ativa, concluída e bloqueada.
+            - 💻 **Tópicos e Subtópicos:** Estrutura modular (`Programação > C++`, `Python`, `Inglês`).
+            - 🤖 **Robô Diário de Aulas:** Script Python integrado ao GitHub Actions que pesquisa novos conteúdos e cria automaticamente a próxima aula no app.
+            - 📱 **Otimização Android:** Progressive Web App (PWA) instalável, vibração háptica no toque e funcionamento offline com Service Worker.
+            - 🖥️ **Otimização Desktop:** Layout expansivo em 3 colunas e atalhos de teclado (<kbd>1</kbd> a <kbd>4</kbd> para alternativas, <kbd>Enter</kbd> para avançar, <kbd>Esc</kbd> para fechar).
+            - 🔊 **Player de Alta Acessibilidade:** Botões gigantes, áudio sintetizado em tempo real e feedback didático imediato.
+
+            ---
+
+            ### 🌐 Como usar:
+            1. Abra `index.html` diretamente no seu navegador, ou
+            2. Ative o **GitHub Pages** nas configurações do repositório para ter o app online gratuitamente!
+          draft: false
+          prerelease: false
