@@ -1,0 +1,6 @@
+<resources>
+    <color name="green_primary">#58cc02</color>
+    <color name="green_dark">#58a700</color>
+    <color name="color_accent">#1cb0f6</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

@@ -99,8 +99,14 @@ class LearnApp {
     this.renderPath();
   }
 
-  // Vibração tátil no Android se suportado
+  // Vibração tátil no Android nativo (Kotlin) ou Web API
   vibrate(ms = 40) {
+    if (window.AndroidBridge && typeof window.AndroidBridge.vibrate === "function") {
+      try {
+        window.AndroidBridge.vibrate(ms);
+        return;
+      } catch (e) {}
+    }
     if ("vibrate" in navigator) {
       try {
         navigator.vibrate(ms);

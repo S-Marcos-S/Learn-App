@@ -1,0 +1,122 @@
+{
+  "topics": [
+    {
+      "id": "programacao",
+      "name": "Programação",
+      "icon": "💻",
+      "subtopics": [
+        {
+          "id": "cpp",
+          "name": "C++",
+          "icon": "⚡",
+          "description": "Domine a linguagem de alta performance, ponteiros, POO e recursos modernos.",
+          "heroTitle": "C++ Moderno & Fundamentos",
+          "lessons": [
+            {
+              "id": "cpp_1",
+              "title": "Olá, Mundo!",
+              "icon": "🚀",
+              "status": "completed",
+              "isDailyAi": false,
+              "steps": [
+                {
+                  "type": "explanation",
+                  "heading": "Seu primeiro código em C++",
+                  "text": "C++ é uma das linguagens mais rápidas e usadas no mundo em motores de jogos, navegadores e sistemas operacionais.",
+                  "code": "#include <iostream>\n\nint main() {\n    std::cout << \"Ola, Mundo!\" << std::endl;\n    return 0;\n}"
+                },
+                {
+                  "type": "keypoint",
+                  "heading": "Ponto-Chave",
+                  "text": "O comando 'std::cout' envia texto para a tela, e o 'std::endl' pula uma linha."
+                },
+                {
+                  "type": "quiz",
+                  "heading": "Teste Rápido",
+                  "question": "Qual comando é usado em C++ para imprimir informações na tela?",
+                  "options": ["std::cin", "std::cout", "print()", "System.out"],
+                  "correctIndex": 1,
+                  "explanation": "std::cout (character output) é o fluxo padrão de saída em C++!"
+                }
+              ]
+            },
+            {
+              "id": "cpp_2",
+              "title": "Variáveis & Tipos",
+              "icon": "📦",
+              "status": "current",
+              "isDailyAi": false,
+              "steps": [
+                {
+                  "type": "explanation",
+                  "heading": "Guardando Dados na Memória",
+                  "text": "Em C++, você precisa declarar o tipo de cada variável antes de usá-la. Os tipos primitivos mais comuns são int, double, char e bool.",
+                  "code": "int idade = 20;             // Numero inteiro\ndouble preco = 19.99;       // Numero com ponto decimal\nchar inicial = 'M';         // Um unico caractere\nbool ativo = true;          // Verdadeiro ou falso"
+                },
+                {
+                  "type": "keypoint",
+                  "heading": "Dica de Ouro",
+                  "text": "Use 'double' em vez de 'float' na maioria dos casos para obter maior precisão com números decimais."
+                },
+                {
+                  "type": "quiz",
+                  "heading": "Desafio de Fixação",
+                  "question": "Qual tipo de dado você deve usar para armazenar o valor 42?",
+                  "options": ["char", "double", "int", "bool"],
+                  "correctIndex": 2,
+                  "explanation": "'int' é o tipo utilizado para armazenar números inteiros!"
+                }
+              ]
+            },
+            {
+              "id": "cpp_3",
+              "title": "Entrada com cin",
+              "icon": "⌨️",
+              "status": "locked",
+              "isDailyAi": false,
+              "steps": [
+                {
+                  "type": "explanation",
+                  "heading": "Lendo Dados do Teclado",
+                  "text": "Para receber dados que o usuário digita no terminal, usamos 'std::cin' com o operador '>>'.",
+                  "code": "int idade;\nstd::cout << \"Digite sua idade: \";\nstd::cin >> idade;"
+                },
+                {
+                  "type": "quiz",
+                  "heading": "Pergunta",
+                  "question": "Qual operador é utilizado junto com std::cin para ler dados?",
+                  "options": ["<<", ">>", "==", "->"],
+                  "correctIndex": 1,
+                  "explanation": "O operador '>>' direciona os dados digitados no teclado para dentro da variável!"
+                }
+              ]
+            },
+            {
+              "id": "cpp_4",
+              "title": "Decisões com if",
+              "icon": "🔀",
+              "status": "locked",
+              "isDailyAi": false,
+              "steps": [
+                {
+                  "type": "explanation",
+                  "heading": "Tomando Decisões",
+                  "text": "A estrutura if/else permite que o seu programa escolha caminhos diferentes com base em condições lógicas.",
+                  "code": "if (nota >= 7) {\n    std::cout << \"Aprovado!\";\n} else {\n    std::cout << \"Recuperacao\";\n}"
+                },
+                {
+                  "type": "quiz",
+                  "heading": "Quiz",
+                  "question": "Qual palavra-chave executa um bloco alternativo caso o 'if' seja falso?",
+                  "options": ["then", "else", "otherwise", "switch"],
+                  "correctIndex": 1,
+                  "explanation": "'else' é o bloco executado quando a condição inicial do 'if' não é atendida."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -78,11 +78,16 @@ Basta abrir o arquivo `index.html` em qualquer navegador moderno no seu computad
 3. Escolha a branch `main` e a pasta `/ (root)`.
 4. Clique em **Save**. Em 1 minuto, seu app estará online em um link público que pode ser acessado de qualquer Android ou PC!
 
-### 3. Rodar o Robô Gerador Manualmente:
-```bash
-python scripts/daily_generator.py
-```
-*(Opcional: adicione a variável de ambiente `GEMINI_API_KEY` para respostas personalizadas com LLM).*
+### 4. Compilar o APK Nativo para Android (Kotlin):
+O projeto conta com uma estrutura nativa completa em **Kotlin** dentro da pasta `android/`:
+* Abra a pasta `android/` no **Android Studio**.
+* Conecte seu celular Android via USB ou inicie um emulador.
+* Clique no botão verde **Run** ou compile o APK via terminal:
+  ```bash
+  cd android
+  ./gradlew assembleDebug
+  ```
+* **Build Automático no GitHub Actions:** O workflow `.github/workflows/build_apk.yml` compila o APK automaticamente na nuvem a cada push e disponibiliza o download direto nos Artefatos de Ação do GitHub!
 
 ---
 
@@ -92,7 +97,18 @@ python scripts/daily_generator.py
 Learn-App/
 ├── .github/
 │   └── workflows/
-│       └── daily_lesson.yml   # Agendador diário no GitHub Actions
+│       ├── daily_lesson.yml   # Agendador diário de aulas com IA
+│       ├── release.yml        # Publicação de novas Releases oficiais
+│       └── build_apk.yml      # Compilação automática do APK Android
+├── android/                   # 📱 PROJETO ANDROID NATIVO EM KOTLIN
+│   ├── app/
+│   │   ├── src/main/java/com/learnapp/
+│   │   │   ├── MainActivity.kt        # Activity principal em Kotlin
+│   │   │   └── WebAppInterface.kt     # Ponte nativa (Vibração e Toasts)
+│   │   ├── src/main/assets/           # Web app embutido para uso 100% offline
+│   │   └── AndroidManifest.xml
+│   ├── build.gradle.kts       # Configuração raiz do Gradle
+│   └── settings.gradle.kts
 ├── css/
 │   └── styles.css             # Estilos responsivos Desktop & Mobile
 ├── data/
