@@ -168,19 +168,56 @@ class LearnApp {
   }
 
   loadState() {
+    const CURRENT_DATA_VERSION = "1.5.0";
+    const savedVersion = localStorage.getItem("learn_app_data_version");
     const savedCourses = localStorage.getItem("learn_app_courses");
-    if (savedCourses) {
+
+    if (savedCourses && savedVersion === CURRENT_DATA_VERSION) {
       try {
         this.coursesData = JSON.parse(savedCourses);
       } catch (e) {
         this.coursesData = initialCoursesData;
       }
     } else {
-      this.coursesData = initialCoursesData;
+      // Migra ou carrega nova versão com suporte a passos longos e desafios práticos de código
+      this.coursesData = this.mergeWithInitialData(savedCourses ? JSON.parse(savedCourses) : null);
+      localStorage.setItem("learn_app_data_version", CURRENT_DATA_VERSION);
+      this.saveState();
     }
 
     this.xp = parseInt(localStorage.getItem("learn_app_xp") || "120", 10);
     this.streak = parseInt(localStorage.getItem("learn_app_streak") || "1", 10);
+  }
+
+  // Preserva o status (completed/current) das lições ao atualizar para a nova versão de conteúdo
+  mergeWithInitialData(savedData) {
+    if (!savedData || !savedData.topics) return initialCoursesData;
+    const completedMap = new Map();
+    try {
+      savedData.topics.forEach(t => {
+        t.subtopics.forEach(s => {
+          this.getSubtopicLessons(s).forEach(l => {
+            if (l.status === "completed" || l.status === "current") {
+              completedMap.set(l.id, l.status);
+            }
+          });
+        });
+      });
+
+      // Aplica aos novos dados
+      initialCoursesData.topics.forEach(t => {
+        t.subtopics.forEach(s => {
+          this.getSubtopicLessons(s).forEach(l => {
+            if (completedMap.has(l.id)) {
+              l.status = completedMap.get(l.id);
+            }
+          });
+        });
+      });
+    } catch (e) {
+      console.warn("Erro ao mesclar dados de versão anterior:", e);
+    }
+    return initialCoursesData;
   }
 
   saveState() {
@@ -300,7 +337,9 @@ class LearnApp {
       });
     }
 
-    this.btnSimulateDaily.addEventListener("click", () => this.openGeneratorModal());
+    if (this.btnSimulateDaily) {
+      this.btnSimulateDaily.addEventListener("click", () => this.openGeneratorModal());
+    }
     this.closeGeneratorModalBtn.addEventListener("click", () => this.closeGeneratorModal());
     this.btnRunSimulation.addEventListener("click", () => this.runDailyLessonSimulation());
 
@@ -766,7 +805,116 @@ class LearnApp {
       this.playerStepContent.appendChild(optionsList);
       this.btnPlayerAction.textContent = "VERIFICAR";
       this.btnPlayerAction.disabled = true;
+    } else if (step.type === "code_challenge") {
+      const container = document.createElement("div");
+      container.className = "code-challenge-container";
+
+      // Banner da Missão Prática
+      const missionBox = document.createElement("div");
+      missionBox.className = "mission-banner";
+      missionBox.innerHTML = `
+        <span class="mission-icon">🎯</span>
+        <div class="mission-text">
+          <strong>MISSÃO PRÁTICA:</strong>
+          <span>${step.instructions}</span>
+        </div>
+      `;
+      container.appendChild(missionBox);
+
+      // Caixa do Editor de Código C++
+      const editorBox = document.createElement("div");
+      editorBox.className = "code-editor-box";
+
+      const windowBar = document.createElement("div");
+      windowBar.className = "editor-window-bar";
+      windowBar.innerHTML = `
+        <div class="editor-dots">
+          <span class="editor-dot red"></span>
+          <span class="editor-dot yellow"></span>
+          <span class="editor-dot green"></span>
+        </div>
+        <span class="editor-filename">main.cpp</span>
+      `;
+      editorBox.appendChild(windowBar);
+
+      if (step.prefixCode) {
+        const prefix = document.createElement("div");
+        prefix.className = "code-prefix";
+        prefix.textContent = step.prefixCode;
+        editorBox.appendChild(prefix);
+      }
+
+      const textarea = document.createElement("textarea");
+      textarea.className = "code-editor-input";
+      textarea.id = "player-code-input";
+      textarea.rows = 3;
+      textarea.spellcheck = false;
+      textarea.autocapitalize = "none";
+      textarea.autocomplete = "off";
+      textarea.placeholder = step.placeholder || "Escreva o comando aqui...";
+      textarea.value = step.initialCode || "";
+      editorBox.appendChild(textarea);
+
+      if (step.suffixCode) {
+        const suffix = document.createElement("div");
+        suffix.className = "code-suffix";
+        suffix.textContent = step.suffixCode;
+        editorBox.appendChild(suffix);
+      }
+
+      container.appendChild(editorBox);
+
+      // Barra de Chips Táteis Rápidos (Atalhos C++ para Mobile / Android)
+      const chipsWrapper = document.createElement("div");
+      chipsWrapper.className = "quick-chips-wrapper";
+      chipsWrapper.innerHTML = `<span class="quick-chips-label">Atalhos rápidos para o código:</span>`;
+
+      const chipsScroll = document.createElement("div");
+      chipsScroll.className = "quick-chips-scroll";
+
+      const chipsList = step.quickChips || ["std::cout", "<<", "\"Ola, Mundo!\"", "std::endl;", ";"];
+      chipsList.forEach(chipText => {
+        const chipBtn = document.createElement("button");
+        chipBtn.className = "chip-btn";
+        chipBtn.type = "button";
+        chipBtn.textContent = chipText;
+        chipBtn.addEventListener("click", () => {
+          this.vibrate(15);
+          this.insertCodeSnippet(textarea, chipText);
+        });
+        chipsScroll.appendChild(chipBtn);
+      });
+
+      chipsWrapper.appendChild(chipsScroll);
+      container.appendChild(chipsWrapper);
+
+      // Console Terminal Simulado
+      const termBox = document.createElement("div");
+      termBox.className = "terminal-simulator";
+      termBox.innerHTML = `
+        <div class="terminal-header">
+          <span class="term-title">terminal — bash</span>
+          <span style="font-size: 0.72rem; color: #4ade80;">● online</span>
+        </div>
+        <pre class="term-output" id="player-terminal-output">$ g++ -std=c++20 main.cpp -o app\nAguardando compilação... Clique em "COMPILAR & EXECUTAR" abaixo.</pre>
+      `;
+      container.appendChild(termBox);
+
+      this.playerStepContent.appendChild(container);
+      this.btnPlayerAction.textContent = "COMPILAR & EXECUTAR";
+      this.btnPlayerAction.disabled = false;
     }
+  }
+
+  // Inserção inteligente de código na posição do cursor
+  insertCodeSnippet(textarea, snippet) {
+    const start = textarea.selectionStart || 0;
+    const end = textarea.selectionEnd || 0;
+    const text = textarea.value;
+    textarea.value = text.substring(0, start) + snippet + text.substring(end);
+    textarea.focus();
+    const newPos = start + snippet.length;
+    textarea.setSelectionRange(newPos, newPos);
   }
 
   handlePlayerAction() {
@@ -797,6 +945,52 @@ class LearnApp {
 
       this.feedbackBanner.classList.remove("hidden");
       this.btnPlayerAction.textContent = "CONTINUAR";
+      return;
+    }
+
+    if (step.type === "code_challenge" && !this.isStepAnswered) {
+      const inputEl = document.getElementById("player-code-input");
+      const termEl = document.getElementById("player-terminal-output");
+      const userCode = inputEl ? inputEl.value.trim() : "";
+
+      const validation = step.validation || {};
+      const expectedTokens = validation.expectedTokens || [];
+
+      // Verifica se todos os tokens esperados estão presentes no código
+      const isCorrect = expectedTokens.every(tok => userCode.includes(tok));
+
+      if (isCorrect) {
+        this.isStepAnswered = true;
+        this.sounds.playCorrect();
+        this.vibrate([40, 40, 80]);
+
+        if (termEl) {
+          termEl.className = "term-output success";
+          termEl.textContent = `$ g++ -std=c++20 main.cpp -o app\n$ ./app\n${validation.expectedOutput || "Executado com sucesso!\n[Processo finalizado com código 0]"}`;
+        }
+
+        this.feedbackBanner.className = "feedback-banner correct";
+        this.feedbackIcon.textContent = "✓";
+        this.feedbackTitle.textContent = "Compilado com Sucesso! 🚀";
+        this.feedbackMessage.textContent = "Excelente! Você escreveu o código corretamente e cumpriu a missão inicial desta aula!";
+        this.feedbackBanner.classList.remove("hidden");
+
+        this.btnPlayerAction.textContent = "CONTINUAR";
+      } else {
+        this.sounds.playWrong();
+        this.vibrate(150);
+
+        if (termEl) {
+          termEl.className = "term-output error";
+          termEl.textContent = `$ g++ -std=c++20 main.cpp -o app\nmain.cpp: erro: instrução incompleta ou sintaxe incorreta.\n> ${validation.hint || "Revise se incluiu todos os comandos pedidos."}`;
+        }
+
+        this.feedbackBanner.className = "feedback-banner wrong";
+        this.feedbackIcon.textContent = "✕";
+        this.feedbackTitle.textContent = "Erro na Compilação";
+        this.feedbackMessage.textContent = validation.hint || "Revise o código digitado e clique em COMPILAR & EXECUTAR novamente.";
+        this.feedbackBanner.classList.remove("hidden");
+      }
       return;
     }
 

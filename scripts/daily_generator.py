@@ -96,8 +96,9 @@ def generate_lesson_with_ai(topic_info):
             model = genai.GenerativeModel("gemini-1.5-flash")
             
             prompt = f"""
-            Você é um professor experiente criando uma aula estilo Duolingo para iniciantes em C++.
-            Crie uma aula completa sobre: "{topic_info['title']}".
+            Você é um professor especialista criando uma aula interativa para iniciantes em C++.
+            Crie uma aula completa, progressiva e aprofundada sobre: "{topic_info['title']}".
+            A aula deve ir do mais simples ao mais difícil, culminando em um desafio de código onde o usuário escreve a solução no final.
             
             Retorne EXATAMENTE um JSON com esta estrutura (sem markdown extra além do bloco json):
             {{
@@ -106,22 +107,47 @@ def generate_lesson_with_ai(topic_info):
               "steps": [
                 {{
                   "type": "explanation",
-                  "heading": "Título claro e instigante",
-                  "text": "Explicação em português simples e direto (2 a 3 frases).",
-                  "code": "// Exemplo curto de C++ com até 6 linhas"
+                  "heading": "🎯 Missão Inicial: O Desafio",
+                  "text": "Apresente de forma simples e instigante o problema prático que o usuário terá que resolver escrevendo código no final da aula."
+                }},
+                {{
+                  "type": "explanation",
+                  "heading": "Entendendo o Conceito",
+                  "text": "Explicação conceitual mastigada com uma analogia simples do dia a dia."
+                }},
+                {{
+                  "type": "explanation",
+                  "heading": "Sintaxe & Anatomia C++",
+                  "text": "Explicação técnica detalhada da sintaxe, palavras-chave e operadores.",
+                  "code": "// Exemplo curto e limpo de código C++"
                 }},
                 {{
                   "type": "keypoint",
                   "heading": "Dica de Ouro",
-                  "text": "O resumo mais importante desta lição."
+                  "text": "Um ponto de atenção crucial ou armadilha comum de compilação."
                 }},
                 {{
                   "type": "quiz",
-                  "heading": "Teste Rápido",
-                  "question": "Pergunta objetiva sobre o tema?",
-                  "options": ["Opcao 1", "Opcao 2", "Opcao 3", "Opcao 4"],
+                  "heading": "Teste de Fixação",
+                  "question": "Pergunta objetiva de múltipla escolha para validar a teoria?",
+                  "options": ["Opção correta", "Distrator 1", "Distrator 2", "Distrator 3"],
                   "correctIndex": 0,
-                  "explanation": "Por que esta opção é a correta."
+                  "explanation": "Explicação clara do porquê a alternativa está correta."
+                }},
+                {{
+                  "type": "code_challenge",
+                  "heading": "Hora de Codificar: Missão Prática",
+                  "instructions": "Instrução clara para o usuário escrever a linha de código necessária para cumprir a missão inicial.",
+                  "prefixCode": "#include <iostream>\\n\\nint main() {{\\n    ",
+                  "placeholder": "digite aqui...",
+                  "initialCode": "",
+                  "suffixCode": "\\n    return 0;\\n}}",
+                  "quickChips": ["chip1", "chip2", ";"],
+                  "validation": {{
+                    "expectedTokens": ["token1", ";"],
+                    "expectedOutput": "Saída esperada impressa no terminal simulado",
+                    "hint": "Dica amigável caso erre"
+                  }}
                 }}
               ]
             }}
@@ -136,7 +162,7 @@ def generate_lesson_with_ai(topic_info):
         except Exception as e:
             print(f"[Aviso] Falha ao consultar Gemini API ({e}). Usando gerador baseado em pesquisa web.")
 
-    # Fallback estruturado didático baseado na pesquisa
+    # Fallback estruturado didático baseado na pesquisa com 6 passos progressivos
     title = topic_info["title"]
     return {
         "title": title,
@@ -144,27 +170,52 @@ def generate_lesson_with_ai(topic_info):
         "steps": [
             {
                 "type": "explanation",
-                "heading": f"Explorando {title}",
-                "text": f"Hoje vamos aprender sobre {title} em C++. Esse conceito é essencial para escrever código modular, eficiente e moderno.",
-                "code": f"// Exemplo de {title}\n#include <iostream>\n\nint main() {{\n    std::cout << \"Dominando {title}!\" << std::endl;\n    return 0;\n}}"
+                "heading": f"🎯 Missão Inicial: Dominando {title}",
+                "text": f"Sua missão nesta aula é entender o funcionamento de {title} e escrever um exemplo funcional no terminal para consolidar seu aprendizado."
+            },
+            {
+                "type": "explanation",
+                "heading": "Entendendo o Conceito",
+                "text": f"No desenvolvimento de software moderno em C++, {title} permite organizar a lógica com clareza, previsibilidade e máxima eficiência de memória."
+            },
+            {
+                "type": "explanation",
+                "heading": f"Sintaxe e Aplicação de {title}",
+                "text": "Veja como a estrutura é declarada e utilizada em um programa C++ moderno:",
+                "code": f"// Aplicando {title}\n#include <iostream>\n\nint main() {{\n    std::cout << \"Executando {title}!\" << std::endl;\n    return 0;\n}}"
             },
             {
                 "type": "keypoint",
                 "heading": "Ponto de Atenção",
-                "text": f"Preste atenção na sintaxe e na clareza ao aplicar {title} no seu dia a dia de programação."
+                "text": f"Preste muita atenção ao escopo, boas práticas e ao ponto-e-vírgula ';' ao aplicar {title} em seus projetos."
             },
             {
                 "type": "quiz",
-                "heading": "Desafio do Dia",
-                "question": f"Qual a principal vantagem de dominar {title} em C++?",
+                "heading": "Quiz de Fixação",
+                "question": f"Qual a principal vantagem de aplicar {title} corretamente em C++?",
                 "options": [
-                    "Aumentar legibilidade e reuso de código",
-                    "Impedir que o computador desligue",
+                    "Aumentar a legibilidade e robustez do código",
+                    "Impedir que o computador precise de energia",
                     "Eliminar a necessidade de compilar",
                     "Reduzir a velocidade do programa"
                 ],
                 "correctIndex": 0,
-                "explanation": f"{title} ajuda a organizar a lógica e construir aplicações robustas e limpas."
+                "explanation": f"{title} é um padrão da linguagem para escrever programas limpos, manuteníveis e de alta performance."
+            },
+            {
+                "type": "code_challenge",
+                "heading": f"Hora de Codificar: {title}",
+                "instructions": f"Cumpra a missão: escreva o comando de saída imprimindo '{title}' usando std::cout e finalizando com ponto-e-vírgula ';'",
+                "prefixCode": "#include <iostream>\n\nint main() {\n    ",
+                "placeholder": f"std::cout << \"{title}\" << std::endl;",
+                "initialCode": "std::cout << ",
+                "suffixCode": "\n    return 0;\n}",
+                "quickChips": ["std::cout <<", f"\"{title}\"", "<< std::endl;", ";"],
+                "validation": {
+                    "expectedTokens": ["std::cout", "<<", ";"],
+                    "expectedOutput": f"{title}\n\n[Processo finalizado com código 0 - Sucesso!]",
+                    "hint": f"Escreva: std::cout << \"{title}\" << std::endl;"
+                }
             }
         ]
     }
