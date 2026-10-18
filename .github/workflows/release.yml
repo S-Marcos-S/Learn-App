@@ -1,4 +1,4 @@
-name: Publicar Release no GitHub
+name: Publicar Release no GitHub com APK
 
 on:
   push:
@@ -7,39 +7,61 @@ on:
   workflow_dispatch:
 
 jobs:
-  release:
+  build-and-release:
+    name: Compilar APK e Publicar Release
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
-      - name: Baixar código
+      - name: Baixar código do repositório
         uses: actions/checkout@v4
 
-      - name: Criar GitHub Release Oficial
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.7'
+
+      - name: Compilar APK Android (Kotlin)
+        run: |
+          cd android
+          gradle assembleDebug --stacktrace
+          cd ..
+          cp android/app/build/outputs/apk/debug/app-debug.apk LearnApp-${{ github.ref_name }}.apk
+
+      - name: Publicar GitHub Release Oficial com APK Anexo
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: "⚡ LearnApp ${{ github.ref_name }}"
+          files: |
+            LearnApp-${{ github.ref_name }}.apk
           body: |
-            ## 🎉 Bem-vindo à versão ${{ github.ref_name }} do LearnApp!
+            ## 🎉 LearnApp ${{ github.ref_name }} - Pronto para Instalar no Android!
 
-            Aplicativo de estudos com interface inspirada no Duolingo, suporte adaptativo completo para **Android e Desktop**, e **criação 100% autônoma de novas aulas diárias por IA**.
-
-            ---
-
-            ### 🚀 Destaques desta Release:
-            - 🗺️ **Trilha de Estudos Estilo Duolingo:** Caminho em zigue-zague senoidal com nós táteis 3D, indicador de aula ativa, concluída e bloqueada.
-            - 💻 **Tópicos e Subtópicos:** Estrutura modular (`Programação > C++`, `Python`, `Inglês`).
-            - 🤖 **Robô Diário de Aulas:** Script Python integrado ao GitHub Actions que pesquisa novos conteúdos e cria automaticamente a próxima aula no app.
-            - 📱 **Otimização Android:** Progressive Web App (PWA) instalável, vibração háptica no toque e funcionamento offline com Service Worker.
-            - 🖥️ **Otimização Desktop:** Layout expansivo em 3 colunas e atalhos de teclado (<kbd>1</kbd> a <kbd>4</kbd> para alternativas, <kbd>Enter</kbd> para avançar, <kbd>Esc</kbd> para fechar).
-            - 🔊 **Player de Alta Acessibilidade:** Botões gigantes, áudio sintetizado em tempo real e feedback didático imediato.
+            Baixe o arquivo **`LearnApp-${{ github.ref_name }}.apk`** na seção **Assets** abaixo para instalar diretamente no seu celular Android.
 
             ---
 
-            ### 🌐 Como usar:
-            1. Abra `index.html` diretamente no seu navegador, ou
-            2. Ative o **GitHub Pages** nas configurações do repositório para ter o app online gratuitamente!
+            ### 🚀 Recursos Desta Versão:
+            - 📱 **APK Nativo em Kotlin:** Funciona 100% offline com todo o conteúdo embutido, sem consumir dados.
+            - 📳 **Ponte Nativa de Vibração:** O celular vibra de verdade ao interagir com os botões e lições.
+            - 🗺️ **Trilha Estilo Duolingo:** Caminho em zigue-zague com nós 3D táteis para **Programação > C++**.
+            - 🤖 **Robô Diário de IA:** Cria autonomamente novas lições todos os dias na sua trilha.
+            - 🎮 **Botões Gigantes e Acessíveis:** Player focado com quizzes interativos e feedback imediato.
+            - 🖥️ **Suporte Desktop:** Também roda em navegadores PC com atalhos de teclado e 3 colunas.
+
+            ---
+
+            ### 📲 Como Instalar o APK no Android:
+            1. No seu celular Android, baixe o arquivo `LearnApp-${{ github.ref_name }}.apk` abaixo.
+            2. Toque no arquivo baixado e selecione **Instalar** (permita "Instalar aplicativos de fontes desconhecidas" se solicitado).
+            3. Pronto! O LearnApp estará instalado na sua lista de aplicativos com ícone próprio e funcionamento offline.
           draft: false
           prerelease: false
