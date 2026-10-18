@@ -182,11 +182,14 @@ def main():
     if not prog_topic:
         raise ValueError("Tópico de Programação não encontrado!")
     
-    cpp_subtopic = next((s for s in prog_topic["subtopics"] if s["id"] == "cpp"), None)
-    if not cpp_subtopic:
-        raise ValueError("Subtópico de C++ não encontrado!")
-
-    existing_titles = [l["title"].lower() for l in cpp_subtopic["lessons"]]
+    # Extrai títulos existentes em todas as seções
+    existing_titles = []
+    if "sections" in cpp_subtopic:
+        for sec in cpp_subtopic["sections"]:
+            for l in sec.get("lessons", []):
+                existing_titles.append(l["title"].lower())
+    elif "lessons" in cpp_subtopic:
+        existing_titles = [l["title"].lower() for l in cpp_subtopic["lessons"]]
     
     # Encontra o próximo tema que ainda não foi adicionado
     next_topic = None
@@ -196,8 +199,9 @@ def main():
             break
             
     if not next_topic:
+        total_count = len(existing_titles) + 1
         next_topic = {
-            "title": f"Tópico Avançado #{len(cpp_subtopic['lessons']) + 1}",
+            "title": f"Tópico Avançado #{total_count}",
             "query": "C++ advanced programming concepts"
         }
 
@@ -216,7 +220,13 @@ def main():
         "steps": lesson_content["steps"]
     }
 
-    cpp_subtopic["lessons"].append(new_lesson)
+    # Adiciona à última seção (Parte 3 • Avançado & Desafios IA)
+    if "sections" in cpp_subtopic and cpp_subtopic["sections"]:
+        cpp_subtopic["sections"][-1]["lessons"].append(new_lesson)
+    else:
+        if "lessons" not in cpp_subtopic:
+            cpp_subtopic["lessons"] = []
+        cpp_subtopic["lessons"].append(new_lesson)
     save_data(data)
 
     print("✔ Aula gerada com sucesso!")

@@ -32,14 +32,14 @@ jobs:
         with:
           gradle-version: '8.7'
 
-      - name: Compilar APK Android (Kotlin)
+      - name: Compilar APK Android Otimizado com R8 (Kotlin)
         run: |
           cd android
-          gradle assembleDebug --stacktrace
+          gradle assembleRelease --stacktrace
 
-      - name: Preparar arquivo do APK
+      - name: Preparar arquivo do APK Otimizado
         run: |
-          cp android/app/build/outputs/apk/debug/app-debug.apk LearnApp-${{ github.ref_name }}.apk
+          cp android/app/build/outputs/apk/release/app-release.apk LearnApp-${{ github.ref_name }}.apk
           ls -la LearnApp-${{ github.ref_name }}.apk
 
       - name: Publicar GitHub Release Oficial com APK Anexo

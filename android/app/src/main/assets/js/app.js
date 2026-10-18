@@ -345,23 +345,31 @@ class LearnApp {
     });
   }
 
+  getSubtopicLessons(subtopic) {
+    if (!subtopic) return [];
+    if (subtopic.sections && Array.isArray(subtopic.sections)) {
+      return subtopic.sections.flatMap(sec => sec.lessons || []);
+    }
+    return subtopic.lessons || [];
+  }
+
   renderHeader() {
     const topic = this.coursesData.topics.find(t => t.id === this.currentTopicId);
     const subtopic = this.getCurrentSubtopic();
 
     if (topic && subtopic) {
-      this.currentCategoryEl.textContent = topic.name;
-      this.currentSubtopicEl.textContent = subtopic.name;
-      this.heroTitleEl.textContent = subtopic.heroTitle || subtopic.name;
-      this.heroDescEl.textContent = subtopic.description;
+      if (this.currentCategoryEl) this.currentCategoryEl.textContent = topic.name;
+      if (this.currentSubtopicEl) this.currentSubtopicEl.textContent = subtopic.name;
+      if (this.heroTitleEl) this.heroTitleEl.textContent = subtopic.heroTitle || subtopic.name;
+      if (this.heroDescEl) this.heroDescEl.textContent = subtopic.description;
     }
 
-    this.streakCountEl.textContent = this.streak;
-    this.xpCountEl.textContent = this.xp;
+    if (this.streakCountEl) this.streakCountEl.textContent = this.streak;
+    if (this.xpCountEl) this.xpCountEl.textContent = this.xp;
   }
 
   // ============================================================================
-  // Renderização da Trilha de Baixo para Cima (Subindo a Montanha)
+  // Renderização da Trilha em Partes / Graus de Dificuldade (Estilo Duolingo)
   // ============================================================================
   renderPath() {
     const subtopic = this.getCurrentSubtopic();
@@ -369,62 +377,87 @@ class LearnApp {
 
     this.nodesList.innerHTML = "";
 
-    const lessons = subtopic.lessons || [];
-
-    lessons.forEach((lesson, index) => {
-      // Cálculo do zigue-zague em senoide: -72px, 0px, +72px, 0px...
-      const offset = Math.round(Math.sin(index * 1.1) * 72);
-
-      const nodeWrapper = document.createElement("div");
-      nodeWrapper.className = `node-wrapper ${lesson.status}`;
-      if (lesson.isDailyAi) nodeWrapper.classList.add("daily-ai");
-      nodeWrapper.style.transform = `translateX(${offset}px)`;
-
-      // Tooltip para o nó atual
-      if (lesson.status === "current") {
-        const tooltip = document.createElement("div");
-        tooltip.className = "node-tooltip";
-        tooltip.textContent = "COMEÇAR!";
-        nodeWrapper.appendChild(tooltip);
+    const sections = subtopic.sections || [
+      {
+        id: "default_sec",
+        number: 1,
+        difficulty: "Completo",
+        title: subtopic.heroTitle || subtopic.name,
+        description: subtopic.description,
+        gradientClass: "gradient-blue",
+        lessons: subtopic.lessons || []
       }
+    ];
 
-      // Botão 3D tátil redondo
-      const circleBtn = document.createElement("button");
-      circleBtn.className = "node-circle-btn";
-      circleBtn.title = lesson.title;
+    let globalIndex = 0;
 
-      let iconDisplay = lesson.icon;
-      if (lesson.status === "completed") {
-        iconDisplay = "✓";
-      } else if (lesson.status === "locked") {
-        iconDisplay = "🔒";
-      }
+    sections.forEach(section => {
+      // 1. Cria o Card da Seção (Grau de Dificuldade)
+      const sectionCard = document.createElement("div");
+      sectionCard.className = `section-card ${section.gradientClass || "gradient-blue"}`;
+      sectionCard.innerHTML = `
+        <div class="section-badge">Parte ${section.number} • ${section.difficulty}</div>
+        <h2 class="section-title">${section.title}</h2>
+        <p class="section-desc">${section.description}</p>
+      `;
+      this.nodesList.appendChild(sectionCard);
 
-      circleBtn.innerHTML = `<span class="node-icon">${iconDisplay}</span>`;
+      // 2. Cria os nós das lições pertencentes a esta seção
+      (section.lessons || []).forEach(lesson => {
+        const offset = Math.round(Math.sin(globalIndex * 1.1) * 72);
 
-      // Evento de clique na lição
-      circleBtn.addEventListener("click", () => {
-        this.vibrate(30);
-        if (lesson.status !== "locked") {
-          this.startLesson(lesson);
-        } else {
-          circleBtn.style.animation = "shake 0.3s";
-          setTimeout(() => circleBtn.style.animation = "", 300);
+        const nodeWrapper = document.createElement("div");
+        nodeWrapper.className = `node-wrapper ${lesson.status}`;
+        if (lesson.isDailyAi) nodeWrapper.classList.add("daily-ai");
+        nodeWrapper.style.transform = `translateX(${offset}px)`;
+
+        // Tooltip para o nó atual
+        if (lesson.status === "current") {
+          const tooltip = document.createElement("div");
+          tooltip.className = "node-tooltip";
+          tooltip.textContent = "COMEÇAR!";
+          nodeWrapper.appendChild(tooltip);
         }
+
+        // Botão 3D tátil redondo
+        const circleBtn = document.createElement("button");
+        circleBtn.className = "node-circle-btn";
+        circleBtn.title = lesson.title;
+
+        let iconDisplay = lesson.icon;
+        if (lesson.status === "completed") {
+          iconDisplay = "✓";
+        } else if (lesson.status === "locked") {
+          iconDisplay = "🔒";
+        }
+
+        circleBtn.innerHTML = `<span class="node-icon">${iconDisplay}</span>`;
+
+        circleBtn.addEventListener("click", () => {
+          this.vibrate(30);
+          if (lesson.status !== "locked") {
+            this.startLesson(lesson);
+          } else {
+            circleBtn.style.animation = "shake 0.3s";
+            setTimeout(() => circleBtn.style.animation = "", 300);
+          }
+        });
+
+        // Rótulo da lição
+        const titleBadge = document.createElement("div");
+        titleBadge.className = "node-title-badge";
+        if (lesson.isDailyAi) {
+          titleBadge.innerHTML = `<span class="node-tag-ia">✨ NOVO</span>${lesson.title}`;
+        } else {
+          titleBadge.textContent = `${globalIndex + 1}. ${lesson.title}`;
+        }
+
+        nodeWrapper.appendChild(circleBtn);
+        nodeWrapper.appendChild(titleBadge);
+        this.nodesList.appendChild(nodeWrapper);
+
+        globalIndex++;
       });
-
-      // Rótulo da lição
-      const titleBadge = document.createElement("div");
-      titleBadge.className = "node-title-badge";
-      if (lesson.isDailyAi) {
-        titleBadge.innerHTML = `<span class="node-tag-ia">✨ NOVO</span>${lesson.title}`;
-      } else {
-        titleBadge.textContent = `${index + 1}. ${lesson.title}`;
-      }
-
-      nodeWrapper.appendChild(circleBtn);
-      nodeWrapper.appendChild(titleBadge);
-      this.nodesList.appendChild(nodeWrapper);
     });
 
     // Conectar nós com curvas SVG após renderizar o DOM
@@ -517,12 +550,15 @@ class LearnApp {
           item.classList.add("active");
         }
 
+        const allSubLessons = this.getSubtopicLessons(sub);
+        const partsCount = (sub.sections && sub.sections.length) || 1;
+
         item.innerHTML = `
           <div class="subtopic-left">
             <span class="subtopic-icon">${sub.icon}</span>
             <div>
               <div class="subtopic-title-text">${sub.name}</div>
-              <div class="subtopic-lessons-count">${sub.lessons.length} aulas na trilha</div>
+              <div class="subtopic-lessons-count">${allSubLessons.length} aulas • ${partsCount} partes</div>
             </div>
           </div>
           <span>➔</span>
@@ -587,7 +623,8 @@ class LearnApp {
     await new Promise(r => setTimeout(r, 600));
 
     const subtopic = this.getCurrentSubtopic();
-    const existingTitles = new Set(subtopic.lessons.map(l => l.title));
+    const allLessons = this.getSubtopicLessons(subtopic);
+    const existingTitles = new Set(allLessons.map(l => l.title));
     const available = dailyLessonPool.find(p => !existingTitles.has(p.title)) || dailyLessonPool[0];
 
     const newLesson = {
@@ -600,12 +637,16 @@ class LearnApp {
       steps: available.steps
     };
 
-    // A nova aula surge no topo da trilha
-    subtopic.lessons.forEach(l => {
+    allLessons.forEach(l => {
       if (l.status === "current") l.status = "completed";
     });
 
-    subtopic.lessons.push(newLesson);
+    if (subtopic.sections && subtopic.sections.length > 0) {
+      subtopic.sections[subtopic.sections.length - 1].lessons.push(newLesson);
+    } else {
+      if (!subtopic.lessons) subtopic.lessons = [];
+      subtopic.lessons.push(newLesson);
+    }
     this.saveState();
 
     this.sounds.playVictory();
@@ -779,10 +820,11 @@ class LearnApp {
 
     // Destrava a próxima lição na trilha se houver
     const subtopic = this.getCurrentSubtopic();
-    const currIdx = subtopic.lessons.findIndex(l => l.id === this.activeLesson.id);
-    if (currIdx !== -1 && currIdx + 1 < subtopic.lessons.length) {
-      if (subtopic.lessons[currIdx + 1].status === "locked") {
-        subtopic.lessons[currIdx + 1].status = "current";
+    const allLessons = this.getSubtopicLessons(subtopic);
+    const currIdx = allLessons.findIndex(l => l.id === this.activeLesson.id);
+    if (currIdx !== -1 && currIdx + 1 < allLessons.length) {
+      if (allLessons[currIdx + 1].status === "locked") {
+        allLessons[currIdx + 1].status = "current";
       }
     }
 

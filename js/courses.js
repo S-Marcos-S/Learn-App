@@ -1,4 +1,4 @@
-// Base de dados inicial dos Cursos, Tópicos e Subtópicos
+// Base de dados inicial dos Cursos estruturada por Partes e Graus de Dificuldade
 const initialCoursesData = {
   topics: [
     {
@@ -10,108 +10,229 @@ const initialCoursesData = {
           id: "cpp",
           name: "C++",
           icon: "⚡",
-          description: "Domine a linguagem de alta performance, ponteiros, POO e recursos modernos.",
-          heroTitle: "C++ Moderno & Fundamentos",
-          lessons: [
+          description: "Domine a linguagem de alta performance dividida em partes por dificuldade.",
+          sections: [
             {
-              id: "cpp_1",
-              title: "Olá, Mundo!",
-              icon: "🚀",
-              status: "completed",
-              isDailyAi: false,
-              steps: [
+              id: "cpp_sec_1",
+              number: 1,
+              difficulty: "Iniciante",
+              title: "C++ Fundamentos & Sintaxe",
+              description: "Dê os primeiros passos com sintaxe básica, tipos primitivos e comandos de entrada e saída.",
+              gradientClass: "gradient-blue",
+              lessons: [
                 {
-                  type: "explanation",
-                  heading: "Seu primeiro código em C++",
-                  text: "C++ é uma das linguagens mais rápidas e usadas no mundo em motores de jogos, navegadores e sistemas operacionais.",
-                  code: '#include <iostream>\n\nint main() {\n    std::cout << "Ola, Mundo!" << std::endl;\n    return 0;\n}'
+                  id: "cpp_1",
+                  title: "Olá, Mundo!",
+                  icon: "🚀",
+                  status: "completed",
+                  isDailyAi: false,
+                  steps: [
+                    {
+                      type: "explanation",
+                      heading: "Seu primeiro código em C++",
+                      text: "C++ é uma das linguagens mais rápidas e usadas no mundo em motores de jogos, navegadores e sistemas operacionais.",
+                      code: '#include <iostream>\n\nint main() {\n    std::cout << "Ola, Mundo!" << std::endl;\n    return 0;\n}'
+                    },
+                    {
+                      type: "keypoint",
+                      heading: "Ponto-Chave",
+                      text: "O comando 'std::cout' envia texto para a tela, e o 'std::endl' pula uma linha."
+                    },
+                    {
+                      type: "quiz",
+                      heading: "Teste Rápido",
+                      question: "Qual comando é usado em C++ para imprimir informações na tela?",
+                      options: ["std::cin", "std::cout", "print()", "System.out"],
+                      correctIndex: 1,
+                      explanation: "std::cout (character output) é o fluxo padrão de saída em C++!"
+                    }
+                  ]
                 },
                 {
-                  type: "keypoint",
-                  heading: "Ponto-Chave",
-                  text: "O comando 'std::cout' envia texto para a tela, e o 'std::endl' pula uma linha."
+                  id: "cpp_2",
+                  title: "Variáveis & Tipos",
+                  icon: "📦",
+                  status: "current",
+                  isDailyAi: false,
+                  steps: [
+                    {
+                      type: "explanation",
+                      heading: "Guardando Dados na Memória",
+                      text: "Em C++, você precisa declarar o tipo de cada variável antes de usá-la. Os tipos primitivos mais comuns são int, double, char e bool.",
+                      code: "int idade = 20;             // Numero inteiro\ndouble preco = 19.99;       // Numero com ponto decimal\nchar inicial = 'M';         // Um unico caractere\nbool ativo = true;          // Verdadeiro ou falso"
+                    },
+                    {
+                      type: "keypoint",
+                      heading: "Dica de Ouro",
+                      text: "Use 'double' em vez de 'float' na maioria dos casos para obter maior precisão com números decimais."
+                    },
+                    {
+                      type: "quiz",
+                      heading: "Desafio de Fixação",
+                      question: "Qual tipo de dado você deve usar para armazenar o valor 42?",
+                      options: ["char", "double", "int", "bool"],
+                      correctIndex: 2,
+                      explanation: "'int' é o tipo utilizado para armazenar números inteiros!"
+                    }
+                  ]
                 },
                 {
-                  type: "quiz",
-                  heading: "Teste Rápido",
-                  question: "Qual comando é usado em C++ para imprimir informações na tela?",
-                  options: ["std::cin", "std::cout", "print()", "System.out"],
-                  correctIndex: 1,
-                  explanation: "std::cout (character output) é o fluxo padrão de saída em C++!"
+                  id: "cpp_3",
+                  title: "Entrada com cin",
+                  icon: "⌨️",
+                  status: "locked",
+                  isDailyAi: false,
+                  steps: [
+                    {
+                      type: "explanation",
+                      heading: "Lendo Dados do Teclado",
+                      text: "Para receber dados que o usuário digita no terminal, usamos 'std::cin' com o operador '>>'.",
+                      code: 'int idade;\nstd::cout << "Digite sua idade: ";\nstd::cin >> idade;'
+                    },
+                    {
+                      type: "quiz",
+                      heading: "Pergunta",
+                      question: "Qual operador é utilizado junto com std::cin para ler dados?",
+                      options: ["<<", ">>", "==", "->"],
+                      correctIndex: 1,
+                      explanation: "O operador '>>' direciona os dados digitados no teclado para dentro da variável!"
+                    }
+                  ]
                 }
               ]
             },
             {
-              id: "cpp_2",
-              title: "Variáveis & Tipos",
-              icon: "📦",
-              status: "current",
-              isDailyAi: false,
-              steps: [
+              id: "cpp_sec_2",
+              number: 2,
+              difficulty: "Intermediário",
+              title: "Lógica & Controle de Fluxo",
+              description: "Domine tomada de decisões lógicas, laços de repetição e criação de funções modulares.",
+              gradientClass: "gradient-green",
+              lessons: [
                 {
-                  type: "explanation",
-                  heading: "Guardando Dados na Memória",
-                  text: "Em C++, você precisa declarar o tipo de cada variável antes de usá-la. Os tipos primitivos mais comuns são int, double, char e bool.",
-                  code: 'int idade = 20;             // Numero inteiro\ndouble preco = 19.99;       // Numero com ponto decimal\nchar inicial = \'M\';         // Um unico caractere\nbool ativo = true;          // Verdadeiro ou falso'
+                  id: "cpp_4",
+                  title: "Decisões com if",
+                  icon: "🔀",
+                  status: "locked",
+                  isDailyAi: false,
+                  steps: [
+                    {
+                      type: "explanation",
+                      heading: "Tomando Decisões",
+                      text: "A estrutura if/else permite que o seu programa escolha caminhos diferentes com base em condições lógicas.",
+                      code: 'if (nota >= 7) {\n    std::cout << "Aprovado!";\n} else {\n    std::cout << "Recuperacao";\n}'
+                    },
+                    {
+                      type: "quiz",
+                      heading: "Quiz",
+                      question: "Qual palavra-chave executa um bloco alternativo caso o 'if' seja falso?",
+                      options: ["then", "else", "otherwise", "switch"],
+                      correctIndex: 1,
+                      explanation: "'else' é o bloco executado quando a condição inicial do 'if' não é atendida."
+                    }
+                  ]
                 },
                 {
-                  type: "keypoint",
-                  heading: "Dica de Ouro",
-                  text: "Use 'double' em vez de 'float' na maioria dos casos para obter maior precisão com números decimais."
+                  id: "cpp_5",
+                  title: "Laço for & Loops",
+                  icon: "🔁",
+                  status: "locked",
+                  isDailyAi: false,
+                  steps: [
+                    {
+                      type: "explanation",
+                      heading: "Repetindo Instruções",
+                      text: "O laço 'for' em C++ repete um bloco determinado de código uma quantidade exata de vezes.",
+                      code: 'for (int i = 0; i < 5; i++) {\n    std::cout << "Repeticao: " << i << std::endl;\n}'
+                    },
+                    {
+                      type: "quiz",
+                      heading: "Pergunta",
+                      question: "Quantas vezes o laço 'for(int i = 0; i < 4; i++)' será executado?",
+                      options: ["3 vezes", "4 vezes", "5 vezes", "Nenhuma vez"],
+                      correctIndex: 1,
+                      explanation: "Ele executa com i valendo 0, 1, 2 e 3, totalizando 4 vezes!"
+                    }
+                  ]
                 },
                 {
-                  type: "quiz",
-                  heading: "Desafio de Fixação",
-                  question: "Qual tipo de dado você deve usar para armazenar o valor 42?",
-                  options: ["char", "double", "int", "bool"],
-                  correctIndex: 2,
-                  explanation: "'int' é o tipo utilizado para armazenar números inteiros!"
+                  id: "cpp_6",
+                  title: "Funções Modulares",
+                  icon: "🧩",
+                  status: "locked",
+                  isDailyAi: false,
+                  steps: [
+                    {
+                      type: "explanation",
+                      heading: "Dividindo para Conquistar",
+                      text: "Funções permitem isolar rotinas e reaproveitar código em qualquer ponto do programa.",
+                      code: 'int dobrar(int x) {\n    return x * 2;\n}'
+                    },
+                    {
+                      type: "quiz",
+                      heading: "Quiz",
+                      question: "Qual tipo de retorno indica que a função não devolve nenhum valor?",
+                      options: ["empty", "null", "void", "none"],
+                      correctIndex: 2,
+                      explanation: "'void' é a palavra-chave para funções que apenas executam ações sem retorno."
+                    }
+                  ]
                 }
               ]
             },
             {
-              id: "cpp_3",
-              title: "Entrada com cin",
-              icon: "⌨️",
-              status: "locked",
-              isDailyAi: false,
-              steps: [
+              id: "cpp_sec_3",
+              number: 3,
+              difficulty: "Avançado",
+              title: "Coleções, Memória & Desafios IA",
+              description: "Domine coleções dinâmicas da STL, ponteiros e receba novas aulas diárias pesquisadas por IA.",
+              gradientClass: "gradient-purple",
+              lessons: [
                 {
-                  type: "explanation",
-                  heading: "Lendo Dados do Teclado",
-                  text: "Para receber dados que o usuário digita no terminal, usamos 'std::cin' com o operador '>>'.",
-                  code: 'int idade;\nstd::cout << "Digite sua idade: ";\nstd::cin >> idade;'
+                  id: "cpp_7",
+                  title: "Vetores (std::vector)",
+                  icon: "📚",
+                  status: "locked",
+                  isDailyAi: false,
+                  steps: [
+                    {
+                      type: "explanation",
+                      heading: "Arrays Dinâmicos",
+                      text: "O std::vector é a coleção mais versátil de C++, crescendo na memória automaticamente à medida que você adiciona itens.",
+                      code: '#include <vector>\n\nstd::vector<int> notas;\nnotas.push_back(10);\nnotas.push_back(9);'
+                    },
+                    {
+                      type: "quiz",
+                      heading: "Desafio",
+                      question: "Qual método adiciona um elemento no final do std::vector?",
+                      options: ["add()", "push_back()", "append()", "insert()"],
+                      correctIndex: 1,
+                      explanation: "push_back() adiciona um novo item ao fim da fila do vetor!"
+                    }
+                  ]
                 },
                 {
-                  type: "quiz",
-                  heading: "Pergunta",
-                  question: "Qual operador é utilizado junto com std::cin para ler dados?",
-                  options: ["<<", ">>", "==", "->"],
-                  correctIndex: 1,
-                  explanation: "O operador '>>' direciona os dados digitados no teclado para dentro da variável!"
-                }
-              ]
-            },
-            {
-              id: "cpp_4",
-              title: "Decisões com if",
-              icon: "🔀",
-              status: "locked",
-              isDailyAi: false,
-              steps: [
-                {
-                  type: "explanation",
-                  heading: "Tomando Decisões",
-                  text: "A estrutura if/else permite que o seu programa escolha caminhos diferentes com base em condições lógicas.",
-                  code: 'if (nota >= 7) {\n    std::cout << "Aprovado!";\n} else {\n    std::cout << "Recuperacao";\n}'
-                },
-                {
-                  type: "quiz",
-                  heading: "Quiz",
-                  question: "Qual palavra-chave executa um bloco alternativo caso o 'if' seja falso?",
-                  options: ["then", "else", "otherwise", "switch"],
-                  correctIndex: 1,
-                  explanation: "'else' é o bloco executado quando a condição inicial do 'if' não é atendida."
+                  id: "cpp_8",
+                  title: "Ponteiros & Endereços",
+                  icon: "🎯",
+                  status: "locked",
+                  isDailyAi: false,
+                  steps: [
+                    {
+                      type: "explanation",
+                      heading: "Manipulação Direta de Memória",
+                      text: "Um ponteiro armazena o endereço de memória onde outra variável está localizada.",
+                      code: 'int valor = 42;\nint* ptr = &valor; // ptr guarda o endereco de memoria de valor'
+                    },
+                    {
+                      type: "quiz",
+                      heading: "Quiz",
+                      question: "Qual operador é usado para obter o endereço de memória de uma variável?",
+                      options: ["*", "&", "#", "->"],
+                      correctIndex: 1,
+                      explanation: "O operador '&' (address-of) retorna o endereço de memória de uma variável!"
+                    }
+                  ]
                 }
               ]
             }
@@ -121,68 +242,38 @@ const initialCoursesData = {
           id: "python",
           name: "Python",
           icon: "🐍",
-          description: "Aprenda sintaxe limpa, automação, análise de dados e inteligência artificial.",
-          heroTitle: "Python do Zero",
-          lessons: [
+          description: "Aprenda sintaxe limpa e automação estruturada por dificuldade.",
+          sections: [
             {
-              id: "py_1",
-              title: "Primeiros Passos",
-              icon: "🚀",
-              status: "current",
-              isDailyAi: false,
-              steps: [
+              id: "py_sec_1",
+              number: 1,
+              difficulty: "Iniciante",
+              title: "Python Fundamentos",
+              description: "Sintaxe limpa, variáveis dinâmicas e primeiros programas.",
+              gradientClass: "gradient-blue",
+              lessons: [
                 {
-                  type: "explanation",
-                  heading: "Bem-vindo ao Python",
-                  text: "Python é conhecido por sua sintaxe simples e legível, perfeita para iniciantes e especialistas.",
-                  code: 'print("Ola do Python!")'
-                },
-                {
-                  type: "quiz",
-                  heading: "Quiz Inicial",
-                  question: "Qual função imprime texto na tela em Python?",
-                  options: ["echo()", "console.log()", "print()", "write()"],
-                  correctIndex: 2,
-                  explanation: "A função print() é o comando padrão de saída em Python."
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: "idiomas",
-      name: "Idiomas",
-      icon: "🌍",
-      subtopics: [
-        {
-          id: "ingles",
-          name: "Inglês",
-          icon: "🇬🇧",
-          description: "Pratique conversação diária, vocabulário e expressões comuns.",
-          heroTitle: "Inglês Prático Diário",
-          lessons: [
-            {
-              id: "eng_1",
-              title: "Saudações",
-              icon: "👋",
-              status: "current",
-              isDailyAi: false,
-              steps: [
-                {
-                  type: "explanation",
-                  heading: "Greetings in English",
-                  text: "Para cumprimentar pessoas em inglês, usamos saudações comuns do dia a dia como Hello, Good Morning e How are you?",
-                  code: 'A: Good morning! How are you?\nB: I am fine, thank you!'
-                },
-                {
-                  type: "quiz",
-                  heading: "Desafio",
-                  question: "Como se diz 'Bom dia' em inglês?",
-                  options: ["Good night", "Good evening", "Good morning", "Goodbye"],
-                  correctIndex: 2,
-                  explanation: "'Good morning' é a saudação adequada pela manhã!"
+                  id: "py_1",
+                  title: "Primeiros Passos",
+                  icon: "🚀",
+                  status: "current",
+                  isDailyAi: false,
+                  steps: [
+                    {
+                      type: "explanation",
+                      heading: "Bem-vindo ao Python",
+                      text: "Python é conhecido por sua legibilidade incrível, permitindo focar na lógica antes de detalhes complexos.",
+                      code: 'print("Ola do Python!")'
+                    },
+                    {
+                      type: "quiz",
+                      heading: "Quiz Inicial",
+                      question: "Qual função imprime dados na tela em Python?",
+                      options: ["echo()", "console.log()", "print()", "write()"],
+                      correctIndex: 2,
+                      explanation: "print() é a função nativa padrão para exibição em Python!"
+                    }
+                  ]
                 }
               ]
             }
@@ -193,75 +284,50 @@ const initialCoursesData = {
   ]
 };
 
-// Banco de tópicos de C++ para o Robô Gerador Diário pesquisar e adicionar automaticamente
+// Piscina de novas aulas para criação autônoma pela IA
 const dailyLessonPool = [
   {
-    title: "Laços com for",
-    icon: "🔁",
+    title: "Strings e Métodos",
+    icon: "🔤",
     steps: [
       {
         type: "explanation",
-        heading: "Repetindo Códigos com for",
-        text: "Pesquisa na web: O laço 'for' em C++ é ideal quando você sabe exatamente quantas vezes deseja repetir uma instrução.",
-        code: 'for (int i = 0; i < 5; i++) {\n    std::cout << "Contador: " << i << std::endl;\n}'
+        heading: "Manipulando Texto com std::string",
+        text: "Pesquisa na web: Diferente de char[], std::string oferece métodos poderosos como .length(), .substr() e concatenação com '+'.",
+        code: '#include <string>\n\nstd::string nome = "Marcos";\nstd::string saudacao = "Ola, " + nome;'
       },
       {
         type: "keypoint",
-        heading: "Ponto-Chave da IA",
-        text: "O operador 'i++' incrementa a variável de controle em +1 a cada volta do laço."
+        heading: "Dica da IA",
+        text: "std::string gerencia o tamanho do texto dinamicamente sem perigo de buffer overflow."
       },
       {
         type: "quiz",
-        heading: "Pergunta Gerada pela IA",
-        question: "Quantas vezes o laço 'for(int i = 0; i < 3; i++)' será executado?",
-        options: ["2 vezes", "3 vezes", "4 vezes", "Infinitas vezes"],
-        correctIndex: 1,
-        explanation: "Os valores de i serão 0, 1 e 2, totalizando exatamente 3 repetições!"
+        heading: "Quiz",
+        question: "Qual operador une duas variáveis do tipo std::string?",
+        options: ["+", "&", ".", "concat()"],
+        correctIndex: 0,
+        explanation: "O operador '+' é sobrecarregado em C++ para concatenar strings com facilidade!"
       }
     ]
   },
   {
-    title: "Vetores (std::vector)",
-    icon: "📚",
+    title: "Classes e POO",
+    icon: "🏗️",
     steps: [
       {
         type: "explanation",
-        heading: "Listas Dinâmicas em C++",
-        text: "Pesquisa na web: Diferente de arrays fixos, o 'std::vector' pode crescer e diminuir de tamanho dinamicamente na memória.",
-        code: '#include <vector>\n\nstd::vector<int> numeros = {10, 20, 30};\nnumeros.push_back(40); // Adiciona o 40 no final'
-      },
-      {
-        type: "keypoint",
-        heading: "Ponto-Chave da IA",
-        text: "O método 'push_back()' insere um novo item no final do vetor de forma automática."
+        heading: "Orientação a Objetos em C++",
+        text: "Pesquisa na web: Uma classe agrupa dados (atributos) e comportamentos (métodos) para modelar elementos do mundo real.",
+        code: 'class Jogador {\npublic:\n    int vida = 100;\n    void atacar() { /* ... */ }\n};'
       },
       {
         type: "quiz",
-        heading: "Quiz de Fixação",
-        question: "Qual método do std::vector adiciona um elemento no fim da coleção?",
-        options: ["add()", "push_back()", "append()", "insert_end()"],
-        correctIndex: 1,
-        explanation: "push_back() é o método padrão da STL de C++ para inserir no final do vetor!"
-      }
-    ]
-  },
-  {
-    title: "Funções em C++",
-    icon: "🧩",
-    steps: [
-      {
-        type: "explanation",
-        heading: "Modularizando seu Código",
-        text: "Funções dividem seu programa em blocos reutilizáveis com entrada (parâmetros) e saída (retorno).",
-        code: 'int somar(int a, int b) {\n    return a + b;\n}\n\nint resultado = somar(5, 7); // resultado sera 12'
-      },
-      {
-        type: "quiz",
-        heading: "Desafio da Função",
-        question: "Qual palavra-chave indica que uma função NÃO retorna nenhum valor?",
-        options: ["null", "empty", "void", "none"],
-        correctIndex: 2,
-        explanation: "O tipo 'void' significa que a função executa uma tarefa sem produzir valor de retorno."
+        heading: "Desafio",
+        question: "Qual modificador de acesso torna membros da classe visíveis fora dela?",
+        options: ["public", "private", "protected", "visible"],
+        correctIndex: 0,
+        explanation: "A palavra-chave 'public' permite acessar métodos e propriedades de qualquer ponto."
       }
     ]
   }
