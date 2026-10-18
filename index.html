@@ -39,6 +39,10 @@
           <span class="nav-icon">✨</span>
           <span class="nav-label">Robô de IA Diário</span>
         </button>
+        <button class="nav-item" id="nav-settings" onclick="window.app && window.app.openSettingsModal()">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Configurações</span>
+        </button>
       </nav>
 
       <div class="sidebar-shortcuts-card">
@@ -74,6 +78,9 @@
             <span class="stat-icon">💎</span>
             <span class="stat-value" id="xp-count">120</span>
           </div>
+          <button class="settings-btn" id="btn-open-settings" title="Abrir Configurações">
+            ⚙️
+          </button>
         </div>
       </header>
 
@@ -109,6 +116,10 @@
           <span>✨</span>
           <small>Robô IA</small>
         </button>
+        <button class="mobile-nav-btn" onclick="window.app && window.app.openSettingsModal()">
+          <span>⚙️</span>
+          <small>Ajustes</small>
+        </button>
       </nav>
     </main>
 
@@ -137,7 +148,7 @@
           <span style="font-size: 1.5rem;">🤖</span>
         </div>
         <p class="card-desc">
-          Pesquisa fontes como Wikipedia e documentação técnica, e cria 1 nova aula por dia diretamente na sua trilha de C++.
+          Pesquisa fontes como Wikipedia e documentação técnica, e cria 1 nova aula por dia diretamente no topo da sua trilha de C++.
         </p>
         <button class="btn-tactile btn-primary btn-sm" onclick="window.app && window.app.openGeneratorModal()">
           Testar Criação Agora
@@ -147,6 +158,93 @@
   </div>
 
   <!-- MODAIS E COMPONENTES GLOBAIS -->
+
+  <!-- Modal de Configurações -->
+  <div class="modal-overlay hidden" id="settings-modal">
+    <div class="modal-card settings-card">
+      <div class="modal-header">
+        <h2>⚙️ Configurações</h2>
+        <button class="modal-close-btn" id="close-settings-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Modo Escuro / Claro / Sistema -->
+        <div class="settings-section">
+          <label class="settings-label">Aparência / Modo Escuro</label>
+          <p class="settings-hint">Por padrão, o LearnApp detecta automaticamente o modo claro ou escuro configurado no seu celular/sistema.</p>
+          <div class="theme-options-grid">
+            <button class="theme-option-btn active" data-theme="system" id="theme-btn-system">
+              <span class="theme-icon">🌓</span>
+              <span class="theme-title">Sistema</span>
+              <small class="theme-sub">Automático</small>
+            </button>
+            <button class="theme-option-btn" data-theme="light" id="theme-btn-light">
+              <span class="theme-icon">☀️</span>
+              <span class="theme-title">Claro</span>
+              <small class="theme-sub">Sempre ativo</small>
+            </button>
+            <button class="theme-option-btn" data-theme="dark" id="theme-btn-dark">
+              <span class="theme-icon">🌙</span>
+              <span class="theme-title">Escuro</span>
+              <small class="theme-sub">Sempre ativo</small>
+            </button>
+          </div>
+        </div>
+
+        <!-- Opções de Interatividade -->
+        <div class="settings-section">
+          <label class="settings-label">Sons & Vibração</label>
+          
+          <div class="settings-toggle-row">
+            <div class="toggle-info">
+              <strong>Efeitos Sonoros</strong>
+              <span>Áudios sintetizados ao acertar ou errar</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="setting-sound" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="settings-toggle-row">
+            <div class="toggle-info">
+              <strong>Vibração Háptica (Android)</strong>
+              <span>Resposta tátil ao tocar botões e alternativas</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="setting-vibration" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Direção da Trilha -->
+        <div class="settings-section">
+          <label class="settings-label">Estrutura do Aprendizado</label>
+          <div class="direction-info-box">
+            <span class="dir-icon">🗺️</span>
+            <div>
+              <strong>Trilha Contínua (Cima para Baixo)</strong>
+              <p>Inicie pelo nó no topo e avance passo a passo destravando novos desafios diários.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dados do Usuário -->
+        <div class="settings-section">
+          <label class="settings-label">Dados de Aprendizado</label>
+          <button class="btn-danger-outline" id="btn-reset-progress">
+            🔄 Redefinir Meu Progresso de Estudos
+          </button>
+        </div>
+
+        <!-- Rodapé do Modal -->
+        <div class="settings-footer-info">
+          <strong>LearnApp v1.2.4</strong>
+          <span>Android Kotlin & Web PWA • Modo Offline Ativo</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal Seletor de Tópicos e Subtópicos -->
   <div class="modal-overlay hidden" id="topic-modal">
@@ -197,7 +295,7 @@
       </div>
       <div class="modal-body">
         <p class="generator-info">
-          Este recurso demonstra como o código no servidor pesquisa novos conteúdos na internet e cria automaticamente o próximo nó do seu caminho de aprendizado!
+          Este recurso demonstra como o código no servidor pesquisa novos conteúdos na internet e cria automaticamente o próximo nó no topo do seu caminho de aprendizado!
         </p>
         <div class="generator-status-box" id="generator-status">
           <div class="status-step" id="gen-step-1">🔍 1. Pesquisando novo tópico na internet (C++20/C++23)...</div>

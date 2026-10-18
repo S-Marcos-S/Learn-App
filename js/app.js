@@ -1,9 +1,11 @@
 // ============================================================================
 // LearnApp - Aplicação de Aprendizado Diário Adaptativa (Android & Desktop)
+// Suporte a Modo Escuro Automático, Configurações e Trilha de Baixo para Cima
 // ============================================================================
 
 class SoundManager {
-  constructor() {
+  constructor(app) {
+    this.app = app;
     this.ctx = null;
   }
 
@@ -17,6 +19,7 @@ class SoundManager {
   }
 
   playCorrect() {
+    if (this.app && !this.app.isSoundEnabled) return;
     this.init();
     if (!this.ctx) return;
     const now = this.ctx.currentTime;
@@ -39,6 +42,7 @@ class SoundManager {
   }
 
   playWrong() {
+    if (this.app && !this.app.isSoundEnabled) return;
     this.init();
     if (!this.ctx) return;
     const now = this.ctx.currentTime;
@@ -60,6 +64,7 @@ class SoundManager {
   }
 
   playVictory() {
+    if (this.app && !this.app.isSoundEnabled) return;
     this.init();
     if (!this.ctx) return;
     const now = this.ctx.currentTime;
@@ -81,7 +86,8 @@ class SoundManager {
 
 class LearnApp {
   constructor() {
-    this.sounds = new SoundManager();
+    this.loadSettings();
+    this.sounds = new SoundManager(this);
     this.loadState();
 
     this.currentTopicId = "programacao";
@@ -93,14 +99,61 @@ class LearnApp {
     this.isStepAnswered = false;
 
     this.initElements();
+    this.applyTheme(this.themePreference);
     this.bindEvents();
     this.bindKeyboardShortcuts();
     this.renderHeader();
     this.renderPath();
+
+    // Rola suavemente até o nó ativo da trilha
+    setTimeout(() => this.scrollToActiveLesson(), 300);
+  }
+
+  // ============================================================================
+  // Gerenciamento de Configurações e Modo Escuro
+  // ============================================================================
+  loadSettings() {
+    this.themePreference = localStorage.getItem("learn_app_theme") || "system";
+    this.isSoundEnabled = localStorage.getItem("learn_app_sound") !== "false";
+    this.isVibrationEnabled = localStorage.getItem("learn_app_vibration") !== "false";
+  }
+
+  saveSettings() {
+    localStorage.setItem("learn_app_theme", this.themePreference);
+    localStorage.setItem("learn_app_sound", this.isSoundEnabled ? "true" : "false");
+    localStorage.setItem("learn_app_vibration", this.isVibrationEnabled ? "true" : "false");
+  }
+
+  applyTheme(theme) {
+    this.themePreference = theme;
+    this.saveSettings();
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    if (theme === "system") {
+      const isSystemDark = mediaQuery.matches;
+      document.documentElement.setAttribute("data-theme", isSystemDark ? "dark" : "light");
+    } else {
+      document.documentElement.setAttribute("data-theme", theme);
+    }
+
+    // Atualiza classes ativas dos botões de tema
+    document.querySelectorAll(".theme-option-btn").forEach(btn => {
+      btn.classList.toggle("active", btn.getAttribute("data-theme") === theme);
+    });
+
+    // Se estiver no Android nativo, atualiza cor da barra de status se disponível
+    if (window.AndroidBridge && typeof window.AndroidBridge.setDarkTheme === "function") {
+      try {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        window.AndroidBridge.setDarkTheme(isDark);
+      } catch (e) {}
+    }
   }
 
   // Vibração tátil no Android nativo (Kotlin) ou Web API
   vibrate(ms = 40) {
+    if (!this.isVibrationEnabled) return;
     if (window.AndroidBridge && typeof window.AndroidBridge.vibrate === "function") {
       try {
         window.AndroidBridge.vibrate(ms);
@@ -149,6 +202,7 @@ class LearnApp {
     this.currentSubtopicEl = document.getElementById("current-subtopic");
     this.streakCountEl = document.getElementById("streak-count");
     this.xpCountEl = document.getElementById("xp-count");
+    this.btnOpenSettings = document.getElementById("btn-open-settings");
 
     // Hero
     this.heroTitleEl = document.getElementById("hero-subtopic-title");
@@ -169,6 +223,12 @@ class LearnApp {
     this.closeGeneratorModalBtn = document.getElementById("close-generator-modal");
     this.btnRunSimulation = document.getElementById("btn-run-simulation");
 
+    this.settingsModal = document.getElementById("settings-modal");
+    this.closeSettingsModalBtn = document.getElementById("close-settings-modal");
+    this.settingSound = document.getElementById("setting-sound");
+    this.settingVibration = document.getElementById("setting-vibration");
+    this.btnResetProgress = document.getElementById("btn-reset-progress");
+
     // Player de Lição
     this.lessonPlayer = document.getElementById("lesson-player");
     this.closeLessonBtn = document.getElementById("close-lesson-btn");
@@ -180,11 +240,65 @@ class LearnApp {
     this.feedbackTitle = document.getElementById("feedback-title");
     this.feedbackMessage = document.getElementById("feedback-message");
     this.btnPlayerAction = document.getElementById("btn-player-action");
+
+    // Sincroniza switches de configurações
+    if (this.settingSound) this.settingSound.checked = this.isSoundEnabled;
+    if (this.settingVibration) this.settingVibration.checked = this.isVibrationEnabled;
   }
 
   bindEvents() {
     this.topicSelectorBtn.addEventListener("click", () => this.openTopicModal());
     this.closeTopicModalBtn.addEventListener("click", () => this.closeTopicModal());
+
+    this.btnOpenSettings.addEventListener("click", () => this.openSettingsModal());
+    this.closeSettingsModalBtn.addEventListener("click", () => this.closeSettingsModal());
+
+    // Seletor de Tema
+    document.querySelectorAll(".theme-option-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const theme = btn.getAttribute("data-theme");
+        this.applyTheme(theme);
+      });
+    });
+
+    // Escuta mudanças de tema no sistema operacional do celular em tempo real
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+      if (this.themePreference === "system") {
+        this.applyTheme("system");
+      }
+    });
+
+    // Toggles de Som e Vibração
+    if (this.settingSound) {
+      this.settingSound.addEventListener("change", (e) => {
+        this.isSoundEnabled = e.target.checked;
+        this.saveSettings();
+      });
+    }
+
+    if (this.settingVibration) {
+      this.settingVibration.addEventListener("change", (e) => {
+        this.isVibrationEnabled = e.target.checked;
+        this.saveSettings();
+        if (this.isVibrationEnabled) this.vibrate(50);
+      });
+    }
+
+    // Resetar progresso
+    if (this.btnResetProgress) {
+      this.btnResetProgress.addEventListener("click", () => {
+        if (confirm("Deseja realmente redefinir seu progresso? Todas as aulas voltarão ao estado inicial.")) {
+          localStorage.removeItem("learn_app_courses");
+          localStorage.removeItem("learn_app_xp");
+          localStorage.removeItem("learn_app_streak");
+          this.loadState();
+          this.renderHeader();
+          this.renderPath();
+          this.closeSettingsModal();
+          alert("Progresso redefinido com sucesso!");
+        }
+      });
+    }
 
     this.btnSimulateDaily.addEventListener("click", () => this.openGeneratorModal());
     this.closeGeneratorModalBtn.addEventListener("click", () => this.closeGeneratorModal());
@@ -200,7 +314,6 @@ class LearnApp {
   // Suporte a teclado no Desktop
   bindKeyboardShortcuts() {
     window.addEventListener("keydown", (e) => {
-      // Se a lição estiver aberta
       if (this.activeLesson) {
         if (e.key === "Escape") {
           this.exitLesson();
@@ -226,6 +339,7 @@ class LearnApp {
         if (e.key === "Escape") {
           this.closeTopicModal();
           this.closeGeneratorModal();
+          this.closeSettingsModal();
         }
       }
     });
@@ -247,7 +361,7 @@ class LearnApp {
   }
 
   // ============================================================================
-  // Renderização da Trilha em Zigue-zague (Estilo Duolingo)
+  // Renderização da Trilha de Baixo para Cima (Subindo a Montanha)
   // ============================================================================
   renderPath() {
     const subtopic = this.getCurrentSubtopic();
@@ -314,7 +428,15 @@ class LearnApp {
     });
 
     // Conectar nós com curvas SVG após renderizar o DOM
-    setTimeout(() => this.drawConnectingPath(), 60);
+    setTimeout(() => this.drawConnectingPath(), 80);
+  }
+
+  // Rola até a lição atual para o usuário começar no lugar certo
+  scrollToActiveLesson() {
+    const currentWrapper = this.nodesList.querySelector(".node-wrapper.current") || this.nodesList.querySelector(".node-wrapper");
+    if (currentWrapper) {
+      currentWrapper.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
   }
 
   drawConnectingPath() {
@@ -330,6 +452,8 @@ class LearnApp {
 
     let pathD = "";
 
+    // Como .nodes-list tem column-reverse, wrappers[0] é a lição 1 (embaixo)
+    // Conectamos de wrappers[0] subindo até wrappers[length - 1]
     wrappers.forEach((wrapper, i) => {
       const btn = wrapper.querySelector(".node-circle-btn");
       const rect = btn.getBoundingClientRect();
@@ -351,9 +475,23 @@ class LearnApp {
       }
     });
 
+    const pathLineColor = document.documentElement.getAttribute("data-theme") === "dark" ? "#2b313f" : "#e5e5e5";
+
     this.pathSvg.innerHTML = `
-      <path d="${pathD}" fill="none" stroke="#e5e5e5" stroke-width="12" stroke-linecap="round" stroke-dasharray="8 12" />
+      <path d="${pathD}" fill="none" stroke="${pathLineColor}" stroke-width="12" stroke-linecap="round" stroke-dasharray="8 12" />
     `;
+  }
+
+  // ============================================================================
+  // Modal de Configurações
+  // ============================================================================
+  openSettingsModal() {
+    this.vibrate(25);
+    this.settingsModal.classList.remove("hidden");
+  }
+
+  closeSettingsModal() {
+    this.settingsModal.classList.add("hidden");
   }
 
   // ============================================================================
@@ -397,6 +535,7 @@ class LearnApp {
           this.closeTopicModal();
           this.renderHeader();
           this.renderPath();
+          setTimeout(() => this.scrollToActiveLesson(), 300);
         });
 
         group.appendChild(item);
@@ -447,7 +586,6 @@ class LearnApp {
     step3.classList.add("active");
     await new Promise(r => setTimeout(r, 600));
 
-    // Seleciona um template da piscina de tópicos de C++
     const subtopic = this.getCurrentSubtopic();
     const existingTitles = new Set(subtopic.lessons.map(l => l.title));
     const available = dailyLessonPool.find(p => !existingTitles.has(p.title)) || dailyLessonPool[0];
@@ -462,7 +600,7 @@ class LearnApp {
       steps: available.steps
     };
 
-    // Atualiza lições anteriores para completed ou locked conforme o fluxo
+    // A nova aula surge no topo da trilha
     subtopic.lessons.forEach(l => {
       if (l.status === "current") l.status = "completed";
     });
@@ -475,7 +613,13 @@ class LearnApp {
     this.closeGeneratorModal();
     this.renderPath();
 
-    alert(`🎉 Nova aula criada com sucesso!\n"${newLesson.title}" foi pesquisada e adicionada à sua trilha de C++!`);
+    setTimeout(() => {
+      // Rola para o topo onde a nova aula surgiu
+      const latestNode = this.nodesList.querySelector(".node-wrapper:last-child");
+      if (latestNode) latestNode.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 200);
+
+    alert(`🎉 Nova aula criada com sucesso na trilha!\n"${newLesson.title}" foi pesquisada e adicionada à sua trilha de C++!`);
   }
 
   // ============================================================================
@@ -649,7 +793,7 @@ class LearnApp {
       <div class="victory-screen">
         <div class="victory-trophy">🏆</div>
         <h2 class="victory-title">Lição Concluída!</h2>
-        <p style="font-size: 1.15rem; color: #555;">Você deu mais um passo fundamental em <strong>${subtopic.name}</strong>!</p>
+        <p style="font-size: 1.15rem; color: var(--text-secondary);">Você deu mais um passo rumo ao topo em <strong>${subtopic.name}</strong>!</p>
         
         <div class="victory-stats">
           <div class="v-stat-card">
